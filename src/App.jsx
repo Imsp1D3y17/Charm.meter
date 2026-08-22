@@ -14,9 +14,7 @@ import kioskWhitePremium from "./assets/kiosk-white-premium.jpg";
 
 const CTA_HREF = "#request-evaluation";
 
-// Get a free access key at https://web3forms.com — enter victorprieto17@gmail.com,
-// they email you a key instantly, no account required. Paste it here.
-const WEB3FORMS_ACCESS_KEY = "YOUR_WEB3FORMS_ACCESS_KEY";
+const WEB3FORMS_ACCESS_KEY = "ea360870-930f-436a-b5cd-b04c00a836e9";
 
 /* -------------------------------------------------------------------- */
 /*  Shared bits                                                          */
