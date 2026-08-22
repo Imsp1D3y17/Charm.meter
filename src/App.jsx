@@ -6,11 +6,17 @@
  * are rendered by the default-exported <App />.
  */
 
+import { useState } from "react";
+
 import kioskBrandedFront from "./assets/kiosk-branded-front.jpg";
 import kioskInteriorLoaded from "./assets/kiosk-interior-loaded.jpg";
 import kioskWhitePremium from "./assets/kiosk-white-premium.jpg";
 
 const CTA_HREF = "#request-evaluation";
+
+// Get a free access key at https://web3forms.com — enter victorprieto17@gmail.com,
+// they email you a key instantly, no account required. Paste it here.
+const WEB3FORMS_ACCESS_KEY = "YOUR_WEB3FORMS_ACCESS_KEY";
 
 /* -------------------------------------------------------------------- */
 /*  Shared bits                                                          */
@@ -25,19 +31,23 @@ function GlowDivider() {
   );
 }
 
-function PrimaryButton({ href, children, className = "" }) {
+function PrimaryButton({ as = "a", href, children, className = "", ...rest }) {
+  const Tag = as === "button" ? "button" : "a";
+  const linkProps = Tag === "a" ? { href } : {};
+
   return (
-    <a
-      href={href}
+    <Tag
+      {...linkProps}
+      {...rest}
       className={
-        "group relative inline-flex items-center justify-center overflow-hidden rounded-md px-8 py-4 font-display text-sm font-semibold uppercase tracking-wide text-black shadow-[0_0_0_1px_rgba(255,255,255,0.08)] transition-transform duration-200 will-change-transform hover:-translate-y-0.5 active:translate-y-0 " +
+        "group relative inline-flex items-center justify-center overflow-hidden rounded-md px-8 py-4 font-display text-sm font-semibold uppercase tracking-wide text-black shadow-[0_0_0_1px_rgba(255,255,255,0.08)] transition-transform duration-200 will-change-transform hover:-translate-y-0.5 active:translate-y-0 disabled:pointer-events-none disabled:opacity-60 " +
         className
       }
     >
       <span className="absolute inset-0 bg-gradient-to-br from-electric via-fuchsia-400 to-magenta transition-transform duration-300 group-hover:scale-110" />
       <span className="absolute inset-0 bg-gradient-to-tr from-white/40 via-transparent to-transparent opacity-60 mix-blend-overlay" />
       <span className="relative">{children}</span>
-    </a>
+    </Tag>
   );
 }
 
@@ -406,6 +416,91 @@ function HowItWorks() {
 }
 
 /* -------------------------------------------------------------------- */
+/*  Evaluation Form                                                      */
+/* -------------------------------------------------------------------- */
+
+const fieldClasses =
+  "w-full rounded-md border border-white/15 bg-ink px-4 py-3 text-sm text-white placeholder-white/30 outline-none transition-colors focus:border-electric/60";
+
+function EvaluationForm() {
+  const [status, setStatus] = useState("idle"); // idle | submitting | success | error
+
+  async function handleSubmit(event) {
+    event.preventDefault();
+    setStatus("submitting");
+
+    const form = event.currentTarget;
+    const formData = new FormData(form);
+    formData.append("access_key", WEB3FORMS_ACCESS_KEY);
+    formData.append("subject", "New Site Evaluation Request — Mega Punch Vending");
+
+    try {
+      const response = await fetch("https://api.web3forms.com/submit", {
+        method: "POST",
+        headers: { Accept: "application/json" },
+        body: formData,
+      });
+      const result = await response.json();
+      if (result.success) {
+        setStatus("success");
+        form.reset();
+      } else {
+        setStatus("error");
+      }
+    } catch {
+      setStatus("error");
+    }
+  }
+
+  if (status === "success") {
+    return (
+      <div className="mx-auto max-w-lg rounded-xl border border-electric/30 bg-electric/5 p-8 text-center">
+        <p className="font-display text-lg font-semibold text-white">Request received.</p>
+        <p className="mt-2 text-sm leading-relaxed text-white/60">
+          Thanks for reaching out — we&rsquo;ll follow up within one business day to
+          schedule your free site evaluation.
+        </p>
+      </div>
+    );
+  }
+
+  return (
+    <form onSubmit={handleSubmit} className="mx-auto max-w-lg text-left">
+      {/* honeypot spam trap, hidden from real visitors */}
+      <input type="checkbox" name="botcheck" className="hidden" tabIndex={-1} autoComplete="off" />
+
+      <div className="grid grid-cols-1 gap-4 sm:grid-cols-2">
+        <input type="text" name="name" placeholder="Your name" required className={fieldClasses} />
+        <input type="email" name="email" placeholder="Email address" required className={fieldClasses} />
+      </div>
+
+      <div className="mt-4 grid grid-cols-1 gap-4 sm:grid-cols-2">
+        <input type="text" name="property_name" placeholder="Property / company name" className={fieldClasses} />
+        <input type="tel" name="phone" placeholder="Phone (optional)" className={fieldClasses} />
+      </div>
+
+      <textarea
+        name="message"
+        placeholder="Tell us a bit about the space (optional)"
+        rows={4}
+        className={"mt-4 resize-none " + fieldClasses}
+      />
+
+      <div className="mt-6 flex flex-col items-center gap-3">
+        <PrimaryButton as="button" type="submit" disabled={status === "submitting"}>
+          {status === "submitting" ? "Sending…" : "Request a Free Site Evaluation"}
+        </PrimaryButton>
+        {status === "error" && (
+          <p className="text-sm text-magenta-soft">
+            Something went wrong — please try again, or call us directly.
+          </p>
+        )}
+      </div>
+    </form>
+  );
+}
+
+/* -------------------------------------------------------------------- */
 /*  About / Footer                                                       */
 /* -------------------------------------------------------------------- */
 
@@ -430,10 +525,8 @@ function AboutFooter() {
           </p>
         </div>
 
-        <div className="mt-14 flex justify-center">
-          <PrimaryButton href="mailto:hello@megapunchvending.com">
-            Request a Free Site Evaluation
-          </PrimaryButton>
+        <div className="mt-14">
+          <EvaluationForm />
         </div>
 
         <div className="mx-auto mt-16 flex max-w-md flex-col items-center gap-1 border-t border-white/10 pt-10 text-center">
