@@ -1,10 +1,14 @@
 /**
  * Mega Punch Vending — B2B Landing Page
  *
- * Single-page layout composed of five sections, each its own component
- * below for readability: Header, Hero, ValueProposition, HowItWorks,
- * and AboutFooter. All are rendered by the default-exported <App />.
+ * Single-page layout composed of components below for readability: Header,
+ * Hero, ValueProposition, KioskShowcase, HowItWorks, and AboutFooter. All
+ * are rendered by the default-exported <App />.
  */
+
+import kioskBrandedFront from "./assets/kiosk-branded-front.jpg";
+import kioskInteriorLoaded from "./assets/kiosk-interior-loaded.jpg";
+import kioskWhitePremium from "./assets/kiosk-white-premium.jpg";
 
 const CTA_HREF = "#request-evaluation";
 
@@ -257,6 +261,79 @@ function ValueProposition() {
 }
 
 /* -------------------------------------------------------------------- */
+/*  Kiosk Showcase                                                       */
+/* -------------------------------------------------------------------- */
+
+const kioskShots = [
+  {
+    src: kioskBrandedFront,
+    accent: "magenta",
+    title: "Illuminated Touchscreen",
+    body: "A 21.5\" storefront that sells itself — bright, branded, and built to draw foot traffic.",
+  },
+  {
+    src: kioskWhitePremium,
+    accent: "electric",
+    title: "Clean, Minimal Finish",
+    body: "Powder-coated steel casing in a neutral finish that fits any lobby, food hall, or retail floor.",
+  },
+  {
+    src: kioskInteriorLoaded,
+    accent: "magenta",
+    title: "8 Aisles, 120 Packs",
+    body: "Fully stocked and cellular-monitored — we know when it's time to restock before you do.",
+  },
+];
+
+function KioskCard({ src, accent, title, body }) {
+  const accentText = accent === "magenta" ? "text-magenta" : "text-electric";
+  const accentRing = accent === "magenta" ? "hover:border-magenta/40" : "hover:border-electric/40";
+
+  return (
+    <div
+      className={
+        "group overflow-hidden rounded-xl border border-white/10 bg-slate transition-colors duration-300 " +
+        accentRing
+      }
+    >
+      <div className="aspect-[4/5] overflow-hidden bg-[#7fe3c3]">
+        <img
+          src={src}
+          alt={title}
+          className="h-full w-full object-cover transition-transform duration-500 group-hover:scale-105"
+        />
+      </div>
+      <div className="p-6">
+        <h3 className={"font-display text-base font-semibold " + accentText}>{title}</h3>
+        <p className="mt-2 text-sm leading-relaxed text-white/55">{body}</p>
+      </div>
+    </div>
+  );
+}
+
+function KioskShowcase() {
+  return (
+    <section className="relative bg-slate py-24 sm:py-28">
+      <div className="mx-auto max-w-6xl px-6 md:px-10">
+        <div className="mx-auto max-w-2xl text-center">
+          <Eyebrow>Meet the Kiosk</Eyebrow>
+          <h2 className="mt-4 font-display text-3xl font-bold tracking-tight text-white sm:text-4xl">
+            No Cheap Plastic. No Gumball Aesthetics.
+          </h2>
+        </div>
+
+        <div className="mt-16 grid grid-cols-1 gap-6 sm:grid-cols-2 lg:grid-cols-3">
+          {kioskShots.map((shot) => (
+            <KioskCard key={shot.title} {...shot} />
+          ))}
+        </div>
+      </div>
+      <GlowDivider />
+    </section>
+  );
+}
+
+/* -------------------------------------------------------------------- */
 /*  How It Works                                                         */
 /* -------------------------------------------------------------------- */
 
@@ -392,6 +469,7 @@ export default function App() {
       <main>
         <Hero />
         <ValueProposition />
+        <KioskShowcase />
         <HowItWorks />
         <AboutFooter />
       </main>
