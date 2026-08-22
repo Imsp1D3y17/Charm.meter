@@ -429,8 +429,12 @@ function EvaluationForm() {
 
     const form = event.currentTarget;
     const formData = new FormData(form);
+    const submittedName = formData.get("name") || "a property manager";
+
     formData.append("access_key", WEB3FORMS_ACCESS_KEY);
-    formData.append("subject", "New Site Evaluation Request — Mega Punch Vending");
+    formData.append("subject", `New Site Evaluation Request from ${submittedName} — Mega Punch Vending`);
+    formData.append("from_name", "Mega Punch Vending Website");
+    formData.append("replyto", formData.get("email"));
 
     try {
       const response = await fetch("https://api.web3forms.com/submit", {
@@ -464,9 +468,6 @@ function EvaluationForm() {
 
   return (
     <form onSubmit={handleSubmit} className="mx-auto max-w-lg text-left">
-      {/* honeypot spam trap, hidden from real visitors */}
-      <input type="checkbox" name="botcheck" className="hidden" tabIndex={-1} autoComplete="off" />
-
       <div className="grid grid-cols-1 gap-4 sm:grid-cols-2">
         <input type="text" name="name" placeholder="Your name" required className={fieldClasses} />
         <input type="email" name="email" placeholder="Email address" required className={fieldClasses} />
