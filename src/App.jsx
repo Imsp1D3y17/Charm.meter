@@ -433,8 +433,6 @@ function EvaluationForm() {
 
     formData.append("access_key", WEB3FORMS_ACCESS_KEY);
     formData.append("subject", `New Site Evaluation Request from ${submittedName} — Mega Punch Vending`);
-    formData.append("from_name", "Mega Punch Vending Website");
-    formData.append("replyto", formData.get("email"));
 
     try {
       const response = await fetch("https://api.web3forms.com/submit", {
